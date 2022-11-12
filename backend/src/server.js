@@ -18,12 +18,13 @@ const app = express();
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
 
+/* This is a route handler. It is a function that is called when a request is made to the server. */
 app.put('/api/articles/:name/upvote', (req, res) => {
     const { name } = req.params;
     const article = articlesInfo.find(a => a.name === name);
     if (article) {
         article.upvote += 1;
-        res.send(`The ${ name } article now has ${ article.upvote } up-votes.`)
+        res.send(`The ${ name } article now has ${ article.upvote } up-votes!!!`)
     }
     else {
         res.send('That article doesn\'t exist!')
