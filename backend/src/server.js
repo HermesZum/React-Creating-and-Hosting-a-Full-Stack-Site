@@ -1,5 +1,16 @@
 /* Importing the express module. */
-import express  from 'express';
+import express from 'express';
+
+let articlesInfo = [ {
+    name: 'learn-react',
+    upvote: 0,
+}, {
+    name: 'learn-node',
+    upvote: 0,
+}, {
+    name: 'mongodb',
+    upvote: 0,
+}, ]
 
 /* Creating an instance of the Express application. */
 const app = express();
@@ -7,9 +18,16 @@ const app = express();
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
 
-/* Creating a route that will respond to a GET request to the path /hello with the text "Hello!" */
-app.post('/hello', (req, res) => {
-    res.send(`Hello ${req.body.name}!`);
+app.put('/api/articles/:name/upvote', (req, res) => {
+    const { name } = req.params;
+    const article = articlesInfo.find(a => a.name === name);
+    if (article) {
+        article.upvote += 1;
+        res.send(`The ${ name } article now has ${ article.upvote } up-votes.`)
+    }
+    else {
+        res.send('That article doesn\'t exist!')
+    }
 });
 
 /* Telling the server to listen on port 8000. */
