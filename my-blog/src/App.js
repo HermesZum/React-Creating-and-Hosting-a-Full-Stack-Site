@@ -8,22 +8,22 @@ import ArticlePage from './pages/ArticlePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
-  return (
-      <BrowserRouter>
-        <div className="App">
-          <NavBar />
-            <div id="page-body">
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/articles" element={<ArticlesListPage />} />
-                    <Route path="/articles/:articleId" element={<ArticlePage />} />
-                    <Route path="/notfound" element={<NotFoundPage />} />
-                </Routes>
+    return (
+        <BrowserRouter>
+            <div className="App">
+                <NavBar/>
+                <div id="page-body">
+                    <Routes>
+                        <Route path="/" element={ <HomePage/> }/>
+                        <Route path="/about" element={ <AboutPage/> }/>
+                        <Route path="/articles" element={ <ArticlesListPage/> }/>
+                        <Route path="/articles/:articleId" element={ <ArticlePage/> }/>
+                        <Route path="*" element={ <NotFoundPage/> }/>
+                    </Routes>
+                </div>
             </div>
-        </div>
-      </BrowserRouter>
-  );
+        </BrowserRouter>
+    );
 }
 
 export default App;
