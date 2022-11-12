@@ -1,25 +1,28 @@
 /* Importing the express module. */
 import express from 'express';
-
-let articlesInfo = [ {
-    name: 'learn-react',
-    upvote: 0,
-    comments: [],
-}, {
-    name: 'learn-node',
-    upvote: 0,
-    comments: [],
-}, {
-    name: 'mongodb',
-    upvote: 0,
-    comments: [],
-}, ]
+/* Importing the MongoClient class from the mongodb module. */
+import { MongoClient } from "mongodb";
 
 /* Creating an instance of the Express application. */
 const app = express();
 
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
+
+app.get('/api/articles/:name', async (req, res) => {
+   const { name } = req.params;
+   const client = new MongoClient('mongodb://127.0.0.1:27017');
+   await client.connect();
+   const db = client.db('react-blog-db');
+   const article = await db.collection('articles').findOne({ name });
+
+   if (article) {
+       res.json(article);
+   }
+   else {
+        res.sendStatus(404);
+   }
+});
 
 /* This is a route handler. It is a function that is called when a request is made to the server. */
 app.put('/api/articles/:name/upvote', (req, res) => {
