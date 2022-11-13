@@ -6,14 +6,23 @@ import { MongoClient } from "mongodb";
 /* Creating an instance of the Express application. */
 const app = express();
 
+/* This is the URL of the MongoDB server. */
+const url = "mongodb://127.0.0.1:27017";
+
+/* Creating a constant variable called database and assigning it the value of "react-blog-db". */
+const database = "react-blog-db";
+
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
 
-app.get('/api/articles/:name', async (req, res) => {
+/* This is a route handler. It is a function that is called when a request is made to the server. */
+app.get('/api/articles/:name', async(req, res) => {
    const { name } = req.params;
-   const client = new MongoClient('mongodb://127.0.0.1:27017');
+
+   const client = new MongoClient(url);
    await client.connect();
-   const db = client.db('react-blog-db');
+   const db = client.db(database);
+
    const article = await db.collection('articles').findOne({ name });
 
    if (article) {
@@ -25,11 +34,20 @@ app.get('/api/articles/:name', async (req, res) => {
 });
 
 /* This is a route handler. It is a function that is called when a request is made to the server. */
-app.put('/api/articles/:name/upvote', (req, res) => {
+app.put('/api/articles/:name/upvote', async(req, res) => {
     const { name } = req.params;
-    const article = articlesInfo.find(a => a.name === name);
+
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db(database);
+
+    await db.collection('articles').updateOne({ name }, {
+        $inc: { upvote: 1 },
+    });
+
+    const article = await db.collection('articles').findOne({ name });
+
     if (article) {
-        article.upvote += 1;
         res.send(`The ${ name } article now has ${ article.upvote } up-votes!!!`)
     }
     else {
@@ -38,12 +56,21 @@ app.put('/api/articles/:name/upvote', (req, res) => {
 });
 
 /* This is a route handler. It is a function that is called when a request is made to the server. */
-app.post('/api/articles/:name/comment', (req, res) => {
+app.post('/api/articles/:name/comment', async(req, res) => {
     const { name } = req.params;
     const { postedBy, text } = req.body;
-    const article = articlesInfo.find(a => a.name === name);
+
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db(database);
+
+    await db.collection('articles').updateOne({ name }, {
+        $push: { comments: { postedBy, text  } },
+    });
+
+    const article = await db.collection('articles').findOne({ name });
+
     if (article) {
-        article.comments.push({ postedBy, text });
         res.send(article.comments)
     }
     else {
