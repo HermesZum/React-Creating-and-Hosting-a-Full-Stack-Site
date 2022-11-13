@@ -2,6 +2,7 @@
   "name": "my-blog",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8000/",
   "dependencies": {
     "@react-buddy/ide-toolbox": "^2.2.1",
     "@testing-library/jest-dom": "^5.16.5",
