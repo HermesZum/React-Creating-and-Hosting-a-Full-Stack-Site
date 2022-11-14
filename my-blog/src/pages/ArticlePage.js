@@ -20,7 +20,7 @@ const ArticlePage = () => {
             setArticleInfo(newArticleInfo);
         }
 
-        loadArticleInfo().then(r => console.log('The page information was successfully loaded!'));
+        loadArticleInfo().then(null);
     }, []);
 
     const article = articles.find(article => article.name === articleId);
