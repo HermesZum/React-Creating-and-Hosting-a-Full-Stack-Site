@@ -123,3 +123,6 @@ dist
 .idea
 *.iml
 gen
+/backend/credentials.json
+/backend/mongodb
+/my-blog/src/dev

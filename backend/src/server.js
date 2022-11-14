@@ -1,7 +1,20 @@
+/* Importing the fs module. */
+import { readFileSync } from "fs";
+/* Importing the firebase-admin module. */
+import admin from 'firebase-admin';
 /* Importing the express module. */
 import express from 'express';
 /* Importing the MongoClient class from the mongodb module. */
 import { db, connectToDb } from "./db.js";
+
+const credentials = JSON.parse(
+    readFileSync('../credentials.json', undefined, undefined, null)
+);
+
+admin.initializeApp({
+    credential: admin.credential.cert(credentials),
+
+});
 
 /* Creating an instance of the Express application. */
 const app = express();

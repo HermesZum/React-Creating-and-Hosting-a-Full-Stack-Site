@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import NotFoundPage from "./NotFoundPage";
 import CommentsList from "../components/CommentsList";
@@ -10,6 +10,8 @@ import articles from "./article-content";
 const ArticlePage = () => {
     const [articleInfo, setArticleInfo] = useState({ upvote: 0, comments: [] });
     const { articleId } = useParams();
+
+    const navigate = useNavigate();
 
     const { user, isLoading } = useUser();
 
