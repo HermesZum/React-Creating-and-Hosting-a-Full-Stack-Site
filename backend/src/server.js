@@ -5,12 +5,14 @@ import admin from 'firebase-admin';
 /* Importing the express module. */
 import express from 'express';
 /* Importing the MongoClient class from the mongodb module. */
-import { db, connectToDb } from "./db.js";
+import { connectToDb, db } from "./db.js";
 
+/* Reading the credentials.json file and parsing it into a JavaScript object. */
 const credentials = JSON.parse(
     readFileSync('../credentials.json', undefined, undefined, null)
 );
 
+/* Initializing the Firebase Admin SDK. */
 admin.initializeApp({
     credential: admin.credential.cert(credentials),
 
@@ -22,13 +24,33 @@ const app = express();
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
 
+/* A middleware function that is called before any other route handler.
+It checks if the request has an auth_token in the header.
+If it does, it verifies the token and adds the user to the request object. */
+app.use (async (req, res, next) => {
+    const { auth_token } = req.header;
+    if (auth_token) {
+        try {
+            req.user = await admin.auth().verifyIdToken(auth_token);
+        }
+        catch (e) {
+            res.sendStatus(400);
+        }
+    }
+
+    next();
+});
+
 /* This is a route handler. It is a function that is called when a request is made to the server. */
 app.get('/api/articles/:name', async(req, res) => {
    const { name } = req.params;
+    const { uid } = req.user;
 
    const article = await db.collection('articles').findOne({ name });
 
    if (article) {
+       const upvoteIds = article.upvoteIds || [];
+       article.canUpvote = uid && !upvoteIds.include(uid);
        res.json(article);
    }
    else {
