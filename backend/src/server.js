@@ -1,26 +1,38 @@
 /* Importing the fs module. */
 import fs from 'fs';
+/* Importing the path module. */
+import path from "path";
 /* Importing the firebase-admin module. */
 import admin from 'firebase-admin';
 /* Importing the express module. */
 import express from 'express';
 /* Importing the MongoClient class from the mongodb module. */
 import { connectToDb, db } from "./db.js";
+/* Importing the fileURLToPath function from the url module. */
+import { fileURLToPath } from 'url';
 
+/* Getting the path of the current file. */
+const __filename = fileURLToPath(import.meta.url);
+/* Getting the path of the current file. */
+const __dirname = path.dirname(__filename);
 /* Reading the credentials.json file and parsing it into a JavaScript object. */
 const credentials = JSON.parse(
     fs.readFileSync('./credentials.json')
 );
-
 /* Initializing the Firebase Admin SDK. */
 admin.initializeApp({
     credential: admin.credential.cert(credentials),
 });
-
 /* Creating an instance of the Express application. */
 const app = express();
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
+/* Telling the server to serve the static files in the build folder. */
+app.use(express.static(path.join(__dirname, '../build')));
+/* This is a route handler. It is a function that is called when a request is made to the server. */
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+})
 
 /* A middleware function that is called before any other route handler.
 It checks if the request has an auth_token in the header.
@@ -121,9 +133,14 @@ app.post('/api/articles/:name/comment', async(req, res) => {
     }
 });
 
+/* Setting the port to the value of the PORT environment variable,
+or 8000 if the PORT environment variable is not set. */
+const PORT = process.env.PORT || 8000;
+
+/* Telling the server to listen on port 8000. */
 connectToDb(() => {
     /* Telling the server to listen on port 8000. */
-    app.listen(8000, () => {
-        console.log('Server is listening on port 8000!')
+    app.listen(PORT, () => {
+        console.log('Server is listening on port ' + PORT)
     });
 }).then(r => console.log('Successfully connected to database.'));
