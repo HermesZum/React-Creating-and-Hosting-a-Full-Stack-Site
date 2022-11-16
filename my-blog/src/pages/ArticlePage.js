@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NotFoundPage from "./NotFoundPage";
 import CommentsList from "../components/CommentsList";
@@ -8,27 +9,34 @@ import useUser from "../hooks/useUser";
 import articles from "./article-content";
 
 const ArticlePage = () => {
-    const [articleInfo, setArticleInfo] = useState({ upvote: 0, comments: [] });
+    const [articleInfo, setArticleInfo] = useState({ upvote: 0, comments: [], canUpvote: false });
+    const { canUpvote } = articleInfo;
     const { articleId } = useParams();
-
     const navigate = useNavigate();
 
     const { user, isLoading } = useUser();
 
     useEffect(() => {
         const loadArticleInfo = async () => {
-            const response = await axios.get(`/api/articles/${ articleId }`);
+            const token = user && await user.getIdToken();
+            const headers = token ? { auth_token: token } : {};
+            const response = await axios.get(`/api/articles/${ articleId }`, { headers });
             const newArticleInfo = response.data;
             setArticleInfo(newArticleInfo);
         }
 
-        loadArticleInfo().then(null);
-    }, []);
+        if (!isLoading) {
+            loadArticleInfo();
+        }
+
+    }, [isLoading, user]);
 
     const article = articles.find(article => article.name === articleId);
 
     const addUpvote = async () => {
-        const response = await axios.put(`/api/articles/${articleId}/upvote`);
+        const token = user && await user.getIdToken();
+        const headers = token ? { auth_token: token } : {};
+        const response = await axios.put(`/api/articles/${articleId}/upvote`, null, { headers } );
         const updatedArticle = response.data;
         setArticleInfo(updatedArticle);
     }
@@ -42,8 +50,8 @@ const ArticlePage = () => {
             <h1>{ article.title }</h1>
             <div className="upvote-section">
                 { user
-                    ? <button onClick={addUpvote}>Upvote</button>
-                    : <button onClick={null}>Log in to upvote</button>
+                    ? <button onClick={addUpvote}>{ canUpvote ? 'Upvote' : 'Already Upvote' }</button>
+                    : <button onClick={ () => { navigate('/login'); } }>Log in to upvote</button>
                 }
                 <span> </span>
                 <p>This article has { articleInfo.upvote } upvote(s)</p>
@@ -57,7 +65,7 @@ const ArticlePage = () => {
                         articleName={articleId}
                         onArticleUpdated={updatedArticle => setArticleInfo(updatedArticle)}
                     />
-                : <button onClick={null}>Log in to comment</button>
+                : <button onClick={ () => { navigate('/login'); } }>Log in to comment</button>
             }
             <CommentsList comments={ articleInfo.comments} />
         </>

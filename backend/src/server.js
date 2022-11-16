@@ -19,7 +19,6 @@ admin.initializeApp({
 
 /* Creating an instance of the Express application. */
 const app = express();
-
 /* Telling the server to parse the body of the request as JSON. */
 app.use(express.json());
 
@@ -33,7 +32,7 @@ app.use(async (req, res, next) => {
             req.user = await admin.auth().verifyIdToken(auth_token);
         }
         catch (e) {
-            res.sendStatus(400);
+            return res.sendStatus(400);
         }
     }
     req.user = req.user || {};
@@ -100,8 +99,17 @@ app.post('/api/articles/:name/comment', async(req, res) => {
     const { text } = req.body;
     const { email } = req.user;
 
+    /**
+     * It takes a user object and returns the first part of the user's email address
+     * @returns The substring of the email address up to the @ symbol.
+     */
+    let trimEmail = () => {
+        const i = email.indexOf('@');
+        return email.substring(0, i);
+    }
+
     await db.collection('articles').updateOne({ name }, {
-        $push: { comments: { postedBy: email, text  } },
+        $push: { comments: { postedBy: trimEmail(), text  } },
     });
     const article = await db.collection('articles').findOne({ name });
 

@@ -125,4 +125,6 @@ dist
 gen
 /backend/credentials.json
 /backend/mongodb
+/backend/build
+/source/dev
 /my-blog/src/dev

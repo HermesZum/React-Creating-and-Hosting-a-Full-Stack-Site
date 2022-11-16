@@ -10,10 +10,15 @@ const LoginPage = () => {
 
     const navigate = useNavigate();
 
+    const refreshPage = ()=>{
+        window.location.reload();
+    }
+
     const logIn = async () => {
         try {
             await signInWithEmailAndPassword(getAuth(), email, password);
-            navigate('/articles')
+            navigate('/articles');
+            refreshPage();
         }
         catch (e) {
             setError(e.message);
@@ -38,6 +43,7 @@ const LoginPage = () => {
                     onChange={e => setPassword(e.target.value)}
                 />
                 <button onClick={logIn}>Log in</button>
+                <span> </span>
                 <Link to="/create-account">Don't have an account? Create one.</Link>
             </div>
         </>
