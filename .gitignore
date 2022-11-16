@@ -124,6 +124,7 @@ dist
 *.iml
 gen
 /backend/credentials.json
+/backend/prod-env.yaml
 /backend/mongodb
 /backend/build
 /my-blog/src/dev
