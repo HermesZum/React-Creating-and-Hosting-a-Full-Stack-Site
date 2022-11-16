@@ -6,6 +6,7 @@ import path from "path";
 import admin from 'firebase-admin';
 /* Importing the express module. */
 import express from 'express';
+import 'dotenv/config';
 /* Importing the MongoClient class from the mongodb module. */
 import { connectToDb, db } from "./db.js";
 /* Importing the fileURLToPath function from the url module. */
